@@ -1,0 +1,17 @@
+{
+  "name": "sinotrans_core_module",
+  "version": "0.0.1",
+  "description": "sinotrans core module",
+  "main": "main.js",
+  "dependencies": {
+    "log4js": "0.6.32",
+    "mysql": "2.10.2",
+    "restify": "4.0.4",
+    "seq": "0.3.5"
+  },
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "mission public",
+  "license": ""
+}
