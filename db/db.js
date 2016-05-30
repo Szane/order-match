@@ -36,7 +36,6 @@ var dbQuery = function (sql, values, callback) {
             })
         }
     })
-
 };
 exports.getCon = getConnection;
 

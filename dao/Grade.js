@@ -37,13 +37,14 @@ function getExportOrderToMatch(callback) {
 /**
  * 模拟获取运输距离
  */
-function getDistance(start, end) {
+function getDistance(start, end, callback) {
     var query = "select * from distance_info where start_zipcode = ? and end_zipcode = ? ";
     var paramsArr = [], i = 0;
     paramsArr[i++] = start;
     paramsArr[i++] = end;
     db.dbQuery(query, paramsArr, function (error, rows) {
-        return rows;
+        if (rows && rows.length > 0)
+            callback(parseFloat(rows[0].distance));
     });
 }
 /**
@@ -54,73 +55,110 @@ function getBoxInfo(station, order) {
 }
 /**
  * 计算调度里程
- * @param iOrder
- * @param eOrder
- * @param station
- * @returns {*}
  */
-function getDispatchDistance(iOrder, eOrder, station) {
-    return getDistance(station.zipcode, iOrder.end_zipcode)[0] + getDistance(station.zipcode, eOrder.start_zipcode)[0];
+function getDispatchDistance(iOrder, eOrder, station, callback) {
+    var distance = 0;
+    Seq().seq(function () {
+        var that = this;
+        getDistance(station.zipcode, iOrder.e_zipcode, function (result) {
+            distance += result;
+            that();
+        });
+    }).seq(function () {
+        getDistance(station.zipcode, eOrder.s_zipcode, function (result) {
+            distance += result;
+            callback(distance);
+        });
+    });
 }
 /**
  * 计算重载里程
- * @param iOrder
- * @param eOrder
- * @param station
- * @returns {*}
  */
-function getFullLoadDistance(iOrder, eOrder, station) {
-    return getDistance(0, iOrder.end_zipcode)[0] + getDistance(0, eOrder.start_zipcode)[0];
+function getFullLoadDistance(iOrder, eOrder, callback) {
+    var distance = 0;
+    Seq().seq(function () {
+        var that = this;
+        getDistance(0, iOrder.e_zipcode, function (result) {
+            distance += result;
+            that();
+        });
+    }).seq(function () {
+        getDistance(0, eOrder.s_zipcode, function (result) {
+            distance += result;
+            callback(distance);
+        });
+    });
 }
 /**
  * 计算等待当量里程
- * @param iOrder
- * @param eOrder
- * @param station
- * @returns {number}
  */
-function getWaitDistance(iOrder, eOrder, station) {
-    var waitTime = getWaitTime(iOrder, eOrder, station);
-    return WAIT_COST_PER_HOUR * waitTime / TRANS_COST_PER_KM / (60 * 60 * 1000);
+function getWaitDistance(iOrder, eOrder, station, callback) {
+    getWaitTime(iOrder, eOrder, station, function (result) {
+        callback(WAIT_COST_PER_HOUR * result / TRANS_COST_PER_KM / (60 * 60 * 1000));
+    });
 }
 /**
  * 计算等待时间
- * @param iOrder
- * @param eOrder
- * @param station
- * @returns {number}
  */
-function getWaitTime(iOrder, eOrder, station) {
+function getWaitTime(iOrder, eOrder, station, callback) {
     //计算调度里程
-    var dispatch = getDispatchDistance(iOrder, eOrder, station);
-    //计算途中时间
-    var runningTime = (dispatch / SPEED_PER_KM) * 60 * 60 * 1000;
-    //计算等待时间
-    return iOrder.e_datetime.getTime() - eOrder.s_datetime.getTime() - MAX_WAIT_MS - UNLOAD_TIME - STATION_OPERATION_TIME - runningTime;
+    var dispatch = 0;
+    Seq().seq(function () {
+        var that = this;
+        getDispatchDistance(iOrder, eOrder, station, function (result) {
+            dispatch += result;
+            that();
+        });
+    }).seq(function () {
+        //计算途中时间
+        var runningTime = (dispatch / SPEED_PER_KM) * 60 * 60 * 1000;
+        //计算等待时间
+        var iDate = new Date(iOrder.e_datetime);
+        var eDate = new Date(eOrder.s_datetime);
+        var waitTime = eDate.getTime() - iDate.getTime() - UNLOAD_TIME - STATION_OPERATION_TIME - runningTime;
+        callback(waitTime);
+    });
 }
 /**
  * 判断到场时间是否匹配
- * @param waitTime
- * @returns {boolean}
  */
 function isTimeMatch(waitTime) {
     return waitTime <= MAX_WAIT_MS;
 }
 /**
  * 计算匹配指数
- * @param iOrder
- * @param eOrder
- * @param station
- * @returns {number}
  */
-function getMatchGrade(iOrder, eOrder, station) {
-    var fullLoadDistance = getFullLoadDistance(iOrder, eOrder, station);
-    var costDistance = getDispatchDistance(iOrder, eOrder, station) + fullLoadDistance + getWaitDistance(iOrder, eOrder, station);
-    if (costDistance > 0) {
-        return fullLoadDistance / costDistance;
-    } else {
-        return 0;
-    }
+function getMatchGrade(iOrder, eOrder, station, callback) {
+    var fullLoadDistance = 0;
+    var dispatchDistance = 0;
+    var waitDistance = 0;
+    Seq().seq(function () {
+        var that = this;
+        getFullLoadDistance(iOrder, eOrder, function (result) {
+            fullLoadDistance = result;
+            that();
+        });
+    }).seq(function () {
+        var that = this;
+        getDispatchDistance(iOrder, eOrder, station, function (result) {
+            dispatchDistance = result;
+            that();
+        });
+    }).seq(function () {
+        var that = this;
+        getWaitDistance(iOrder, eOrder, station, function (result) {
+            waitDistance = result;
+            that();
+        });
+    }).seq(function () {
+        var costDistance = parseFloat(dispatchDistance + fullLoadDistance + waitDistance);
+        if (costDistance > 0) {
+            callback(fullLoadDistance / costDistance);
+        } else {
+            callback(0);
+        }
+    });
+
 }
 
 function getAvailableOrders(callback) {
@@ -168,27 +206,113 @@ function getAvailableOrders(callback) {
  */
 function generateMatrix(iOrders, eOrders, callback) {
     var matrix = [];//权值矩阵
-    for (var k = 0; k < stations.length; k++) {
-        for (var i = 0; i < iOrders.length; i++) {
-            var line = [];//矩阵的行
-            for (var j = 0; j < eOrders.length; j++) {
-                var waitTime = getWaitTime(iOrders[i], eOrders[j], stations[k]);
-                if (isTimeMatch(waitTime)) {
-                    //如果时间条件允许，则计算匹配指数
-                    var matchGrade = getMatchGrade(iOrders[i], eOrders[j], stations[k]);
-                    //小于阈值的记为0
-                    line.push(matchGrade >= THRESHOLD ? matchGrade : 0);
-                } else {
-                    //时间条件不合适，指数记为0
-                    line.push(0);
-                }
-            }
-            matrix.push(line);
-        }
-    }
-    callback(matrix);
-}
+    Seq(iOrders).seqEach(function (iOrder, i) {
+        var that = this;
+        var line = [];//矩阵的行
+        cb(iOrder, i, function () {
+            Seq(eOrders).seqEach(function (eOrder, j) {
+                var that = this;
+                var waitTime = 0;
+                var maxMatch = 0;
+                cb(eOrder, j, function () {
+                    Seq(stations).seqEach(function (station, k) {
+                        var that = this;
+                        cb(station, k, function () {
+                            var matchGrade = 0;
+                            Seq().seq(function () {
+                                var that = this;
+                                getWaitTime(iOrder, eOrder, station, function (result) {
+                                    waitTime = result;
+                                    that();
+                                });
+                            }).seq(function () {
+                                var that = this;
+                                if (isTimeMatch(waitTime)) {
+                                    //如果时间条件允许，则计算匹配指数
+                                    getMatchGrade(iOrder, eOrder, station, function (result) {
+                                        matchGrade = result;
+                                        //小于阈值的记为0
+                                        matchGrade = matchGrade >= THRESHOLD ? matchGrade : 0;
+                                        maxMatch = matchGrade > maxMatch ? matchGrade : maxMatch;
+                                        that();
+                                    });
+                                } else {
+                                    //时间条件不合适，指数记为0
+                                    that();
+                                }
+                            }).seq(function () {
+                                that(null, k);
+                            });
+                        });
+                    }).seq(function () {
+                        line.push(maxMatch);
+                        that(null, j);
+                    });
+                });
+            }).seq(function () {
+                matrix.push(line);
+                that(null, i);
+            });
+        });
+    }).seq(function () {
+        console.log(matrix);
+        callback(matrix);
+    });
 
+    // Seq().seq(function () {
+    //     var that = this;
+    //     Seq(iOrders).seqEach(function (iOrder, i) {
+    //         var that = this;
+    //         var line = [];//矩阵的行
+    //         Seq(eOrders).seqEach(function (eOrder, j) {
+    //             var that = this;
+    //             var waitTime = 0;
+    //             var maxMatch = 0;
+    //             Seq(stations).seqEach(function (station, k) {
+    //                 var that = this;
+    //                 var matchGrade = 0;
+    //                 Seq().seq(function () {
+    //                     var that = this;
+    //                     getWaitTime(iOrder, eOrder, station, function (result) {
+    //                         waitTime = result;
+    //                         that();
+    //                     });
+    //                 }).seq(function () {
+    //                     var that = this;
+    //                     if (isTimeMatch(waitTime)) {
+    //                         //如果时间条件允许，则计算匹配指数
+    //                         getMatchGrade(iOrder, eOrder, station, function (result) {
+    //                             matchGrade = result;
+    //                             //小于阈值的记为0
+    //                             matchGrade = matchGrade >= THRESHOLD ? matchGrade : 0;
+    //                             maxMatch = matchGrade > maxMatch ? matchGrade : maxMatch;//
+    //                             that();
+    //                         });
+    //                     } else {
+    //                         //时间条件不合适，指数记为0
+    //                         that();
+    //                     }
+    //                 }).seq(function () {
+    //                     that(null, k);
+    //                 });
+    //             }).seq(function () {
+    //                 line.push(maxMatch);
+    //                 that(null, j);
+    //             });
+    //         }).seq(function () {
+    //             console.log(line);
+    //             matrix.push(line);
+    //             that(null, i);
+    //         });
+    //     }).seq(function () {
+    //         console.log(matrix);
+    //         that();
+    //     });
+    // })
+}
+function cb(value, i, callback) {
+    callback(value, i);
+}
 module.exports = {
     getImportOrderToMatch: getImportOrderToMatch,
     getExportOrderToMatch: getExportOrderToMatch,

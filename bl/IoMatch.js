@@ -15,20 +15,27 @@ function getIoMatchResult(req, res, next) {
             that();
         });
     }).seq(function () {
-        grade.generateMatrix(orders.iOrders, orders.eOrders, function (matrix) {
-            km.weight = matrix;
-        });
-        km.nx = km.weight.length;
-        km.ny = km.weight[0].length;
-        var match = km.match;
-        var cost = km.bestmatch();
-        console.log("max cost " + cost + "\n");
-        for (var i = 0; i < ny; i++) {
-            if (match[i] > -1) {
-                console.log("X" + match[i] + ",Y" + i);
+        Seq().seq(function () {
+            var that = this;
+            grade.generateMatrix(orders.iOrders, orders.eOrders, function (matrix) {
+                km.weight = matrix;
+                that();
+            });
+        }).seq(function () {
+            km.nx = km.weight.length;
+            if (km.nx > 0) {
+                km.ny = km.weight[0].length;
+                var match = km.match;
+                var cost = km.bestmatch();
+                console.log("max cost " + cost + "\n");
+                for (var i = 0; i < ny; i++) {
+                    if (match[i] > -1) {
+                        console.log("X" + match[i] + ",Y" + i);
+                    }
+                }
             }
-        }
-        return next();
+            return next();
+        })
     });
 }
 module.exports = {
