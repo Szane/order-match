@@ -153,7 +153,7 @@ function getMatchGrade(iOrder, eOrder, station, callback) {
     }).seq(function () {
         var costDistance = parseFloat(dispatchDistance + fullLoadDistance + waitDistance);
         if (costDistance > 0) {
-            callback(fullLoadDistance / costDistance);
+            callback(parseInt(fullLoadDistance / costDistance * 1000));
         } else {
             callback(0);
         }
@@ -171,11 +171,16 @@ function getAvailableOrders(callback) {
         getImportOrderToMatch(function (error, rows) {
             var importOrders = rows;
             for (var i = 0; i < importOrders.length; i++) {
+                var boxRight = false;
                 for (var k = 0; k < stations.length; k++) {
                     //查询箱源（fake）,箱源有效的订单保留
                     if (getBoxInfo(stations[k], importOrders[i])) {
-                        iOrders.push(importOrders[i]);
+                        boxRight = true;
+                        break;
                     }
+                }
+                if (boxRight) {
+                    iOrders.push(importOrders[i]);
                 }
             }
             that();
@@ -186,11 +191,16 @@ function getAvailableOrders(callback) {
         getExportOrderToMatch(function (error, rows) {
             var exportOrders = rows;
             for (var j = 0; j < exportOrders.length; j++) {
+                var boxRight = false;
                 for (var k = 0; k < stations.length; k++) {
                     //查询箱源（fake）,箱源有效的订单保留
                     if (getBoxInfo(stations[k], exportOrders[j])) {
-                        eOrders.push(exportOrders[j]);
+                        boxRight = true;
+                        break;
                     }
+                }
+                if (boxRight) {
+                    eOrders.push(exportOrders[j]);
                 }
             }
             that();
@@ -206,109 +216,65 @@ function getAvailableOrders(callback) {
  */
 function generateMatrix(iOrders, eOrders, callback) {
     var matrix = [];//权值矩阵
-    Seq(iOrders).seqEach(function (iOrder, i) {
+    Seq().seq(function () {
         var that = this;
-        var line = [];//矩阵的行
-        cb(iOrder, i, function () {
-            Seq(eOrders).seqEach(function (eOrder, j) {
-                var that = this;
-                var waitTime = 0;
-                var maxMatch = 0;
-                cb(eOrder, j, function () {
-                    Seq(stations).seqEach(function (station, k) {
-                        var that = this;
-                        cb(station, k, function () {
-                            var matchGrade = 0;
-                            Seq().seq(function () {
-                                var that = this;
-                                getWaitTime(iOrder, eOrder, station, function (result) {
-                                    waitTime = result;
-                                    that();
-                                });
-                            }).seq(function () {
-                                var that = this;
-                                if (isTimeMatch(waitTime)) {
-                                    //如果时间条件允许，则计算匹配指数
-                                    getMatchGrade(iOrder, eOrder, station, function (result) {
-                                        matchGrade = result;
-                                        //小于阈值的记为0
-                                        matchGrade = matchGrade >= THRESHOLD ? matchGrade : 0;
-                                        maxMatch = matchGrade > maxMatch ? matchGrade : maxMatch;
+        Seq(iOrders).seqEach(function (iOrder, i) {
+            var that = this;
+            var line = [];//矩阵的行
+            cb(iOrder, i, function (iOrder, i) {
+                Seq(eOrders).seqEach(function (eOrder, j) {
+                    var that = this;
+                    var waitTime = 0;
+                    var maxMatch = 0;
+                    cb(eOrder, j, function (eOrder, j) {
+                        Seq(stations).seqEach(function (station, k) {
+                            var that = this;
+                            cb(station, k, function (station, k) {
+                                var matchGrade = 0;
+                                Seq().seq(function () {
+                                    var that = this;
+                                    getWaitTime(iOrder, eOrder, station, function (result) {
+                                        waitTime = result;
                                         that();
                                     });
-                                } else {
-                                    //时间条件不合适，指数记为0
-                                    that();
-                                }
-                            }).seq(function () {
-                                that(null, k);
+                                }).seq(function () {
+                                    var that = this;
+                                    if (isTimeMatch(waitTime)) {
+                                        //如果时间条件允许，则计算匹配指数
+                                        getMatchGrade(iOrder, eOrder, station, function (result) {
+                                            matchGrade = result;
+                                            //小于阈值的记为0
+                                            matchGrade = matchGrade >= THRESHOLD ? matchGrade : 0;
+                                            //取k个场站中最大的M值
+                                            maxMatch = matchGrade > maxMatch ? matchGrade : maxMatch;
+                                            that();
+                                        });
+                                    } else {
+                                        //时间条件不合适，指数记为0
+                                        that();
+                                    }
+                                }).seq(function () {
+                                    that(null, k);
+                                });
                             });
+                        }).seq(function () {
+                            line.push(maxMatch);
+                            that(null, j);
                         });
-                    }).seq(function () {
-                        line.push(maxMatch);
-                        that(null, j);
                     });
+                }).seq(function () {
+                    console.log(line);
+                    matrix.push(line);
+                    that(null, i);
                 });
-            }).seq(function () {
-                matrix.push(line);
-                that(null, i);
             });
+        }).seq(function () {
+            that();
         });
     }).seq(function () {
         console.log(matrix);
         callback(matrix);
     });
-
-    // Seq().seq(function () {
-    //     var that = this;
-    //     Seq(iOrders).seqEach(function (iOrder, i) {
-    //         var that = this;
-    //         var line = [];//矩阵的行
-    //         Seq(eOrders).seqEach(function (eOrder, j) {
-    //             var that = this;
-    //             var waitTime = 0;
-    //             var maxMatch = 0;
-    //             Seq(stations).seqEach(function (station, k) {
-    //                 var that = this;
-    //                 var matchGrade = 0;
-    //                 Seq().seq(function () {
-    //                     var that = this;
-    //                     getWaitTime(iOrder, eOrder, station, function (result) {
-    //                         waitTime = result;
-    //                         that();
-    //                     });
-    //                 }).seq(function () {
-    //                     var that = this;
-    //                     if (isTimeMatch(waitTime)) {
-    //                         //如果时间条件允许，则计算匹配指数
-    //                         getMatchGrade(iOrder, eOrder, station, function (result) {
-    //                             matchGrade = result;
-    //                             //小于阈值的记为0
-    //                             matchGrade = matchGrade >= THRESHOLD ? matchGrade : 0;
-    //                             maxMatch = matchGrade > maxMatch ? matchGrade : maxMatch;//
-    //                             that();
-    //                         });
-    //                     } else {
-    //                         //时间条件不合适，指数记为0
-    //                         that();
-    //                     }
-    //                 }).seq(function () {
-    //                     that(null, k);
-    //                 });
-    //             }).seq(function () {
-    //                 line.push(maxMatch);
-    //                 that(null, j);
-    //             });
-    //         }).seq(function () {
-    //             console.log(line);
-    //             matrix.push(line);
-    //             that(null, i);
-    //         });
-    //     }).seq(function () {
-    //         console.log(matrix);
-    //         that();
-    //     });
-    // })
 }
 function cb(value, i, callback) {
     callback(value, i);

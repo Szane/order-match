@@ -4,14 +4,12 @@
 
 var INF = 0xffffff;
 var MAX = 2000;
-var weight = [];
 var lx = [MAX], ly = [MAX];
 var match = [MAX];
 var visX = [MAX], visY = [MAX];
 var slack = [MAX];
-var nx, ny;
 
-function initVertex() {
+function initVertex(nx, ny, weight) {
     // 初始化标号
     for (var i = 0; i < nx; i++) {
         lx [i] = -INF;
@@ -24,7 +22,7 @@ function initVertex() {
         match[k] = -1;
     }
 }
-function path(u) {
+function path(u, ny, weight) {
     visX[u] = true;
     for (var v = 0; v < ny; v++) {
         if (visY[v])
@@ -43,8 +41,8 @@ function path(u) {
     }
     return false;
 }
-function bestmatch() {
-    initVertex();
+function bestmatch(nx, ny, weight) {
+    initVertex(nx, ny, weight);
     for (var u = 0; u < nx; u++) {
         for (var i = 0; i < ny; i++) {
             slack[i] = INF;
@@ -56,7 +54,7 @@ function bestmatch() {
             for (i = 0; i < ny; i++) {
                 visY[i] = 0;
             }
-            if (path(u))
+            if (path(u, ny, weight))
                 break;
             var dx = INF;
             for (i = 0; i < ny; i++) {
@@ -86,9 +84,6 @@ function bestmatch() {
     return sum;
 }
 module.exports = {
-    weight: weight,
     match: match,
-    nx: nx,
-    ny: ny,
     bestmatch: bestmatch
 };
