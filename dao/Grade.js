@@ -11,7 +11,7 @@ var UNLOAD_TIME = 5 * 60 * 60 * 1000;//卸货时间
 var STATION_OPERATION_TIME = 60 * 60 * 1000;//场站操作时间
 var WAIT_COST_PER_HOUR = 10;//等待时薪
 var TRANS_COST_PER_KM = 6;//公里运价
-var THRESHOLD = 0.625;//匹配阈值
+var THRESHOLD = 625;//匹配阈值
 var SPEED_PER_KM = 50;
 var stations = [{
     zipcode: 111111

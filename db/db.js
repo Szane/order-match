@@ -25,7 +25,7 @@ var dbQuery = function (sql, values, callback) {
             logger.error("Connect mysql error :", conError.message);
             callback(conError, null);
         } else {
-            logger.debug(con.format(sql, values));
+            // logger.debug(con.format(sql, values));
             con.query(sql, values, function (error, rows) {
                 if (error) {
                     logger.error("Execute mysql query error :" + con.format(sql, values) + "\n" + error.message);
