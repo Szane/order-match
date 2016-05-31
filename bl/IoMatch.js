@@ -36,14 +36,14 @@ function getIoMatchResult(req, res, next) {
                 if (iOrders.length > eOrders.length) {
                     for (var i = 0; i < ny; i++) {
                         if (km.match[i] > -1) {
-                            console.log(iOrders[i].id + "," + eOrders[km.match[i]].id);
+                            console.log(iOrders[i].id + "," + eOrders[km.match[i]].id + "," + weight[km.match[i]][i]);
                             map.push([iOrders[i].id, eOrders[km.match[i]].id, weight[km.match[i]][i]]);
                         }
                     }
                 } else {
                     for (i = 0; i < ny; i++) {
                         if (km.match[i] > -1) {
-                            console.log(iOrders[km.match[i]].id + "," + eOrders[i].id);
+                            console.log(iOrders[km.match[i]].id + "," + eOrders[i].id + "," + weight[km.match[i]][i]);
                             map.push([iOrders[km.match[i]].id, eOrders[i].id, weight[km.match[i]][i]]);
                         }
                     }
