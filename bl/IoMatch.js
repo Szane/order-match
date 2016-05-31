@@ -33,10 +33,19 @@ function getIoMatchResult(req, res, next) {
                 var sum = km.bestmatch(nx, ny, weight);
                 console.log("max cost " + sum + "\n");
                 var map = [];
-                for (var i = 0; i < ny; i++) {
-                    if (km.match[i] > -1) {
-                        console.log(iOrders[km.match[i]].id + "," + eOrders[i].id);
-                        map.push([iOrders[km.match[i]].id, eOrders[i].id, weight[km.match[i]][i]]);
+                if (iOrders.length > eOrders.length) {
+                    for (var i = 0; i < ny; i++) {
+                        if (km.match[i] > -1) {
+                            console.log(iOrders[i].id + "," + eOrders[km.match[i]].id);
+                            map.push([iOrders[i].id, eOrders[km.match[i]].id, weight[km.match[i]][i]]);
+                        }
+                    }
+                } else {
+                    for (i = 0; i < ny; i++) {
+                        if (km.match[i] > -1) {
+                            console.log(iOrders[km.match[i]].id + "," + eOrders[i].id);
+                            map.push([iOrders[km.match[i]].id, eOrders[i].id, weight[km.match[i]][i]]);
+                        }
                     }
                 }
                 var result = {
