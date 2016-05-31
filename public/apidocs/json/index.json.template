@@ -1,0 +1,1436 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "The documents for mission public sinotrans core api",
+    "version": "1.0.0",
+    "title": "MP sinotrans core api doc",
+    "contact": {
+      "email": "ling.xue@missionpublic.com"
+    },
+    "license": {
+      "name": "View source at github",
+      "url": "https://github.com/mpinc/sinotrans-core"
+    }
+  },
+  "host": "@@apiHost",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "order",
+      "description": " sinotrans order ",
+      "externalDocs": {
+        "description": "sinotrans order",
+        "url": "@@apiHost"
+      }
+    },
+    {
+      "name": "truck_price",
+      "description": " sinotrans truck price ",
+      "externalDocs": {
+        "description": "sinotrans truck price",
+        "url": "@@apiHost"
+      }
+    },
+    {
+      "name": "ship_info",
+      "description": " sinotrans ship info ",
+      "externalDocs": {
+        "description": "sinotrans ship info",
+        "url": "@@apiHost"
+      }
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/order": {
+      "post": {
+        "tags": [
+          "order"
+        ],
+        "summary": "add order",
+        "description": "",
+        "operationId": "createOrderInfo",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "itemArray:{'itemWeight':0,\n'containerSize':0,\n'containerCount':0,\n'containerShape':0}",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderInfo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "order"
+        ],
+        "summary": "get Order Info",
+        "description": "",
+        "operationId": "getOrderInfo",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sUserId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sBizId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sBizName",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "orderStatus",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "orderType",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "shipInfo",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "shipNum",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "ladingNum",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "sZipcode",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sDateTimeStart",
+            "description": "",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "sDateTimeEnd",
+            "description": "",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "eZipcode",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "eDateTimeStart",
+            "description": "",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "eDateTimeEnd",
+            "description": "",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "end",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/orderItem/{orderItemId}/accept": {
+      "put": {
+        "tags": [
+          "order"
+        ],
+        "summary": "update order's status",
+        "description": "",
+        "operationId": "updateOrderStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderItemId",
+            "description": "order's PK",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "status and taker id",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Taker"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/order/{orderId}/status/{status}": {
+      "put": {
+        "tags": [
+          "order"
+        ],
+        "summary": "update order's status",
+        "description": "",
+        "operationId": "updateOrderStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "description": "order's PK",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "path",
+            "name": "status",
+            "description": "order's status(to be defined)",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/order/{orderId}/orderItem/{orderItemId}/status/{status}": {
+      "put": {
+        "tags": [
+          "order"
+        ],
+        "summary": "update orderItem's status",
+        "description": "",
+        "operationId": "updateOrderItemStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "description": "order's PK",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "path",
+            "name": "orderItemId",
+            "description": "orderItem's PK",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "path",
+            "name": "status",
+            "description": "orderItem's status(to be defined)",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/orderItem": {
+      "get": {
+        "tags": [
+          "order"
+        ],
+        "summary": "get orderItems",
+        "description": "",
+        "operationId": "getOrderItems",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderItemId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "orderId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sBizId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sUserId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "tBizId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "tUserId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "itemStatus",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "truckId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "driverId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/orderInfoAndItem": {
+      "get": {
+        "tags": [
+          "order"
+        ],
+        "summary": "get orderItems",
+        "description": "",
+        "operationId": "getOrderItems",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderItemId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "orderId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sBizId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sUserId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "tBizId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "tUserId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "itemStatus",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "truckId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "driverId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/order/{orderId}/orderItem": {
+      "put": {
+        "tags": [
+          "order"
+        ],
+        "summary": "update orderItem's info",
+        "description": "",
+        "operationId": "updateOrderItem",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderId",
+            "description": "",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderItem"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/order/{orderId}/orderItem/{orderItemId}": {
+      "get": {
+        "tags": [
+          "order"
+        ],
+        "summary": "get orderInfoAndItems",
+        "description": "",
+        "operationId": "getOrderInfoAndItems",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orderItemId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "path",
+            "name": "orderId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sBizId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sUserId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "tBizId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "tUserId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "itemStatus",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "truckId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "driverId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/orderHistory": {
+      "post": {
+        "tags": [
+          "order"
+        ],
+        "summary": "add order history",
+        "description": "",
+        "operationId": "createOrderHistory",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderHistory"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "order"
+        ],
+        "summary": "get order history",
+        "description": "",
+        "operationId": "getOrderHistory",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderHistoryId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "orderId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "opUser",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "startTime",
+            "description": "",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "endTime",
+            "description": "",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/truckPrice": {
+      "post": {
+        "tags": [
+          "truck_price"
+        ],
+        "summary": "add truck price",
+        "description": "",
+        "operationId": "addTruckPrice",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "truck price info",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TruckPrice"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "truck_price"
+        ],
+        "summary": "get truck price",
+        "description": "",
+        "operationId": "getTruckPrice",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "truckPriceId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "transType",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sAreaCode",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "eAreaCode",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "containerCount",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "containerSize",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "containerShape",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "outLimit",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "goodsWeight",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "goodsType",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "price",
+            "description": "",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "page params",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "page params",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/truckPrice/{truckPriceId}": {
+      "put": {
+        "tags": [
+          "truck_price"
+        ],
+        "summary": "modify truck price",
+        "description": "",
+        "operationId": "updateTruckPrice",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "truckPriceId",
+            "description": "truck price id ",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "truck price info ",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TruckPrice"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/truckPrice/{truckPriceIds}": {
+      "delete": {
+        "tags": [
+          "truck_price"
+        ],
+        "summary": "delete truck price",
+        "description": "",
+        "operationId": "deleteTruckPrice",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "truckPriceIds",
+            "description": "truck price id(s) ",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/truckPriceUpload": {
+      "post": {
+        "tags": [
+          "truck_price"
+        ],
+        "summary": "uploads csv file",
+        "description": "csv file convert and add into mysql",
+        "operationId": "uploadCsvFile",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "csv",
+            "in": "formData",
+            "description": "file to upload",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/truckPriceDownload.csv": {
+      "get": {
+        "tags": [
+          "truck_price"
+        ],
+        "summary": "download truck price csv file",
+        "description": "",
+        "operationId": "ExportTruckPrice",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "truckPriceId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "transType",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "sAreaCode",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "eAreaCode",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "containerCount",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "containerSize",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "containerShape",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "outLimit",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "goodsWeight",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "goodsType",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "price",
+            "description": "",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "page params",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "page params",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/shipInfo": {
+      "get": {
+        "tags": [
+          "ship_info"
+        ],
+        "summary": "get ship info",
+        "description": "",
+        "operationId": "getShipInfo",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "shipInfoId",
+            "description": "",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "innerId",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "nameLang",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "pid",
+            "description": "",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "OrderInfo": {
+      "type": "object",
+      "required": [
+        "sUserId",
+        "sBizId",
+        "orderStatus"
+      ],
+      "properties": {
+        "sUserId": {
+          "type": "integer"
+        },
+        "sBizId": {
+          "type": "integer"
+        },
+        "tUserId": {
+          "type": "integer"
+        },
+        "tBizId": {
+          "type": "integer"
+        },
+        "orderStatus": {
+          "type": "integer"
+        },
+        "orderType": {
+          "type": "integer"
+        },
+        "totalPrice": {
+          "type": "number"
+        },
+        "sZipcode": {
+          "type": "integer"
+        },
+        "sRegion": {
+          "type": "string"
+        },
+        "sAddress": {
+          "type": "string"
+        },
+        "sManager": {
+          "type": "string"
+        },
+        "sPhone": {
+          "type": "string"
+        },
+        "sDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "eZipcode": {
+          "type": "integer"
+        },
+        "eRegion": {
+          "type": "string"
+        },
+        "eAddress": {
+          "type": "string"
+        },
+        "eManager": {
+          "type": "string"
+        },
+        "ePhone": {
+          "type": "string"
+        },
+        "eDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "shipId": {
+          "type": "integer"
+        },
+        "shipInfo": {
+          "type": "string"
+        },
+        "shipBizId": {
+          "type": "integer"
+        },
+        "shipBizInfo": {
+          "type": "string"
+        },
+        "shipNum": {
+          "type": "string"
+        },
+        "ladingNum": {
+          "type": "string"
+        },
+        "containerYardId": {
+          "type": "integer"
+        },
+        "containerYard": {
+          "type": "string"
+        },
+        "containerStatId": {
+          "type": "integer"
+        },
+        "containerStat": {
+          "type": "string"
+        },
+        "facName": {
+          "type": "string"
+        },
+        "pDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "aDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "goodsType": {
+          "type": "integer"
+        },
+        "goodsName": {
+          "type": "integer"
+        },
+        "packType": {
+          "type": "integer"
+        },
+        "goodsTotalWeight": {
+          "type": "number"
+        },
+        "goodsTotalCount": {
+          "type": "integer"
+        },
+        "goodsTotalVol": {
+          "type": "number"
+        },
+        "goodsTotalPrice": {
+          "type": "number"
+        },
+        "itemArray": {
+          "type": "array",
+          "items": "object"
+        },
+        "outLimit": {
+          "type": "integer"
+        },
+        "overLoad": {
+          "type": "integer"
+        },
+        "itemStatus": {
+          "type": "integer"
+        },
+        "truckId": {
+          "type": "integer"
+        },
+        "truckInfo": {
+          "type": "string"
+        },
+        "driverId": {
+          "type": "integer"
+        },
+        "driverInfo": {
+          "type": "string"
+        },
+        "driverPhone": {
+          "type": "string"
+        },
+        "remark": {
+          "type": "string"
+        }
+      }
+    },
+    "OrderItem": {
+      "type": "object",
+      "required": [
+        "truckId",
+        "driverId"
+      ],
+      "properties": {
+        "truckId": {
+          "type": "integer"
+        },
+        "truckInfo": {
+          "type": "integer"
+        },
+        "driverId": {
+          "type": "string"
+        },
+        "driverInfo": {
+          "type": "string"
+        },
+        "driverPhone": {
+          "type": "string"
+        }
+      }
+    },
+    "TruckPrice": {
+      "type": "object",
+      "required": [
+        "transType",
+        "sStateCode",
+        "sCityCode",
+        "sAreaCode",
+        "sState",
+        "sCity",
+        "sArea",
+        "eStateCode",
+        "eCityCode",
+        "eAreaCode",
+        "eState",
+        "eCity",
+        "eArea",
+        "containerCount",
+        "containerSize",
+        "containerShape",
+        "outLimit",
+        "goodsWeight",
+        "goodsType",
+        "price"
+      ],
+      "properties": {
+        "transType": {
+          "type": "integer"
+        },
+        "sStateCode": {
+          "type": "integer"
+        },
+        "sCityCode": {
+          "type": "integer"
+        },
+        "sAreaCode": {
+          "type": "integer"
+        },
+        "sState": {
+          "type": "string"
+        },
+        "sCity": {
+          "type": "string"
+        },
+        "sArea": {
+          "type": "string"
+        },
+        "eStateCode": {
+          "type": "integer"
+        },
+        "eCityCode": {
+          "type": "integer"
+        },
+        "eAreaCode": {
+          "type": "integer"
+        },
+        "eState": {
+          "type": "string"
+        },
+        "eCity": {
+          "type": "string"
+        },
+        "eArea": {
+          "type": "string"
+        },
+        "containerCount": {
+          "type": "integer"
+        },
+        "containerSize": {
+          "type": "integer"
+        },
+        "containerShape": {
+          "type": "integer"
+        },
+        "outLimit": {
+          "type": "integer"
+        },
+        "goodsWeight": {
+          "type": "integer"
+        },
+        "goodsType": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "number"
+        },
+        "remark": {
+          "type": "string"
+        }
+      }
+    },
+    "OrderHistory": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "type"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "integer"
+        },
+        "remark": {
+          "type": "string"
+        },
+        "opUser": {
+          "type": "integer"
+        }
+      }
+    },
+    "Taker": {
+      "type": "object",
+      "required": [
+        "tUserId",
+        "tBizId"
+      ],
+      "properties": {
+        "tUserId": {
+          "type": "integer"
+        },
+        "tBizId": {
+          "type": "integer"
+        },
+        "orderStatus": {
+          "type": "integer"
+        },
+        "itemStatus": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

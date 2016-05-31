@@ -1,0 +1,50 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "The documents for mission public sinotrans core api",
+    "version": "1.0.0",
+    "title": "MP sinotrans core api doc",
+    "contact": {
+      "email": "ling.xue@missionpublic.com"
+    },
+    "license": {
+      "name": "View source at github",
+      "url": "https://github.com/mpinc/sinotrans-core"
+    }
+  },
+  "host": "localhost:8099",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "order-match",
+      "description": " sinotrans order ",
+      "externalDocs": {
+        "description": "sinotrans order",
+        "url": "localhost:8099"
+      }
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/ioMatch": {
+      "get": {
+        "tags": [
+          "order-match"
+        ],
+        "summary": "add order",
+        "description": "",
+        "operationId": "get order-match result",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  }
+}

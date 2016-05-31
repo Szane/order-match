@@ -9,16 +9,20 @@ var Seq = require('seq');
 function getIoMatchResult(req, res, next) {
     var orders = {};
     var weight = [];
+    var iOrders = [];
+    var eOrders = [];
     Seq().seq(function () {
         var that = this;
         grade.getAvailableOrders(function (result) {
             orders = result;
+            iOrders = orders.iOrders;
+            eOrders = orders.eOrders;
             that();
         });
     }).seq(function () {
         Seq().seq(function () {
             var that = this;
-            grade.generateMatrix(orders.iOrders, orders.eOrders, function (matrix) {
+            grade.generateMatrix(iOrders, eOrders, function (matrix) {
                 weight = matrix;
                 that();
             });
@@ -28,12 +32,19 @@ function getIoMatchResult(req, res, next) {
                 var ny = weight[0].length;
                 var sum = km.bestmatch(nx, ny, weight);
                 console.log("max cost " + sum + "\n");
+                var map = [];
                 for (var i = 0; i < ny; i++) {
                     if (km.match[i] > -1) {
-                        console.log("X" + km.match[i] + ",Y" + i);
+                        console.log(iOrders[km.match[i]].id + "," + eOrders[i].id);
+                        map.push([iOrders[km.match[i]].id, eOrders[i].id, weight[km.match[i]][i]]);
                     }
                 }
+                var result = {
+                    sum: sum,
+                    map: map
+                }
             }
+            res.send(result);
             return next();
         })
     });
