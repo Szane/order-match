@@ -30,14 +30,14 @@ function initLogger(name, options) {
 
 function createLogger(name) {
     return initLogger(name, {
-        level: '@@logLevel',
+        level: 'info',
         config: {
             appenders: [
                 {type: 'console'},
                 {
                     "type": "file",
                     "filename": "../sinotrans-core.log",
-                    "maxLogSize": 52100,
+                    "maxLogSize": 5120000,
                     "backups": 1
                 }
             ]

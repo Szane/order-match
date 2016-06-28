@@ -22,6 +22,14 @@
         "description": "sinotrans order",
         "url": "localhost:8099"
       }
+    },
+    {
+      "name": "distance",
+      "description": " sinotrans order ",
+      "externalDocs": {
+        "description": "sinotrans order",
+        "url": "localhost:8099"
+      }
     }
   ],
   "schemes": [
@@ -38,6 +46,64 @@
         "operationId": "get order-match result",
         "produces": [
           "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/distance": {
+      "get": {
+        "tags": [
+          "distance"
+        ],
+        "summary": "",
+        "description": "",
+        "operationId": "",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "destination",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/location": {
+      "get": {
+        "tags": [
+          "distance"
+        ],
+        "summary": "",
+        "description": "",
+        "operationId": "",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "address",
+            "required": false,
+            "type": "string"
+          }
         ],
         "responses": {
           "200": {

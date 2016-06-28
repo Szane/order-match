@@ -6,6 +6,7 @@ var restify = require('restify');
 var serverLogger = require('./ServerLogger.js');
 var logger = serverLogger.createLogger('server.js');
 var ioMatch = require('./bl/IoMatch.js');
+var distance = require('./bl/Distance.js');
 
 function createServer(options) {
     var server = restify.createServer({
@@ -50,6 +51,9 @@ function createServer(options) {
         directory: './public'
     }));
     server.get('/api/ioMatch', ioMatch.getIoMatchResult);
+    server.get('/api/distance', distance.getDistance);
+    server.get('/api/location', distance.getLocation);
+    server.get('/api/initDistance', distance.initDistances);
 
     server.on('NotFound', function (req, res, next) {
         res.send(404);
